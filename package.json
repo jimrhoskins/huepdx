@@ -1,0 +1,24 @@
+{
+  "name": "huepdx",
+  "version": "1.0.0",
+  "description": "Hue color control for PDX",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src --out-dir lib --copy-files",
+    "start": "node lib/index",
+    "dev": "nodemon --exec babel-node src/index.js",
+    "lint": "eslint src"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "request": "^2.67.0",
+    "slack-client": "^1.5.0"
+  },
+  "devDependencies": {
+    "babel": "^6.3.13",
+    "babel-cli": "^6.3.13"
+  }
+}
