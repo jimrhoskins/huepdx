@@ -12,7 +12,7 @@ export default class MessageHandler {
     const match = message.text.match(this.pattern);
 
     if (match) {
-      this.callback({match, message});
+      this.callback(match.slice(1), message);
     }
   }
 }

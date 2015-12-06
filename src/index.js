@@ -1,4 +1,4 @@
-import HueClient from './HueClient';
+import { HueApi, lightState } from 'node-hue-api';
 import SlackClient from './SlackClient';
 
 const {
@@ -7,19 +7,40 @@ const {
   HUE_USERNAME
 } = process.env;
 
-
-const hue = new HueClient(HUE_IP, HUE_USERNAME);
+const hue = new HueApi(HUE_IP, HUE_USERNAME);
 const client = new SlackClient(SLACK_TOKEN);
 
+client.register(/light (\d+|\*) (on|off)/, ([light, state]) => {
+  const s = lightState.create();
+  if (state === 'on') {
+    s.on();
+  } else {
+    s.off();
+  }
 
-client.register(/light (\d+) (.+)/, ({match, message}) => {
-  const light = match[1];
-  const state = match[2];
+  // Change all lights:
+  if (light === '*') {
+    hue.lights().then(({ lights }) => {
+      lights.forEach(({ id }) => {
+        hue.setLightState(id, s);
+      })
+    });
+  } else {
+    hue.setLightState(light, s);
+  }
+});
 
-  const on = state == "on";
-
-  hue.setLight(light, {on});
-  console.log('Light called',  match);
+client.register(/light (\d+|\*) strobe/, ([light]) => {
+  const state = lightState.create().longAlert();
+  if (light === '*') {
+    hue.lights().then(({ lights }) => {
+      lights.forEach(({ id }) => {
+        hue.setLightState(id, state);
+      })
+    });
+  } else {
+    hue.setLightState(light, state);
+  }
 });
 
 client.login();
